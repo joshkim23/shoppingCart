@@ -3,8 +3,8 @@
 This is another vanilla JS project where I practiced working with objects, arrays, event listeners, loops, and more. 
 
 Key features: 
-quantity input that populates dynamically with the +/- buttons
-subtotal per item/overall subtotal/tax/Total cost values that autopopulate
+1. quantity input that populates dynamically with the +/- buttons
+2. subtotal per item/overall subtotal/tax/Total cost values that autopopulate
 
 features to complete: 
 1. just have an ul in the html file, have the list elements autopopulate using JS only
