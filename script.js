@@ -19,83 +19,107 @@ const groceryList = [
         groceryItem: "Coke 48 Pack",
         forTextPricePerUnit: "$19.99/box",
         pricePerUnit: 19.99
+    }, {
+        groceryItem: "RANDOM ITEM USER ADDED",
+        forTextPricePerUnit: "24 dolla per chug",
+        pricePerUnit: 24.00
     }
 ];
 
-// add shopping cart item names 
-const names = document.querySelectorAll(".item-name");
 
-const updateItems = () => {
-    for(let i=0; i<names.length; i++) {
-        const name = names[i];
-        name.innerHTML = groceryList[i].groceryItem + " (" + groceryList[i].forTextPricePerUnit + ")";
-    }
-};
-updateItems();
+const list = document.querySelector('.list');
+let minusButtons = [];
+let quantities = [];
+let plusButtons = [];
+let itemSubtotals = [];
 
 
-// array of id's for each type
-const quantityInputID = ["quantity1", "quantity2", "quantity3", "quantity4", "quantity5"];
-const subtractID = ["minus1", "minus2", "minus3", "minus4", "minus5"];
-const addID = ["plus1", "plus2", "plus3", "plus4", "plus5"];
-const itemSubTotalID = ["sub1", "sub2", "sub3", "sub4", "sub5"];
+const initialize = () => {
+    for(let i=0; i<groceryList.length; i++) {
+        // create a new list element per loop for each item
+        let listItemEl = document.createElement('li');
 
-//make an array of elements that are grabbed by id according to type
-const quantIdEl = makeElementArray(quantityInputID);
-const minusBtnEl = makeElementArray(subtractID);
-const plusBtnEl = makeElementArray(addID);
-const liSubtotalEl = makeElementArray(itemSubTotalID);
+        //for the description of the item
+        let spanItemEl = document.createElement('span');
+        spanItemEl.className = "item-name";
+        spanItemEl.innerHTML = groceryList[i].groceryItem + " (" + groceryList[i].forTextPricePerUnit + ")";
+        listItemEl.appendChild(spanItemEl);
 
-// function that creates the array of elements for a given type
-function makeElementArray(idArray) {
-    let array = [];
-    for (let i=0; i<groceryList.length; i++) {
-        array[i] = document.getElementById(idArray[i]);
-    }
-    return array;
-};
+        // for the - button, quantity input, + button
+        let spanQuantityBox = document.createElement('span');
+        spanQuantityBox.className = "quantity-box";
+        minusButtons[i] = document.createElement('button');
+        minusButtons[i].className = "add-or-subtract";
+        minusButtons[i].innerHTML = " - ";
+        spanQuantityBox.appendChild(minusButtons[i]);
+        listItemEl.appendChild(spanQuantityBox);
+
+        quantities[i] = document.createElement('input');
+        quantities[i].placeholder = "0";
+        spanQuantityBox.appendChild(quantities[i]);
+
+        plusButtons[i] = document.createElement('button');
+        plusButtons[i].className = "add-or-subtract";
+        plusButtons[i].innerHTML = " + ";
+        spanQuantityBox.appendChild(plusButtons[i]);
+        listItemEl.appendChild(spanQuantityBox);
+
+        // for the item list subtotal
+        itemSubtotals[i] = document.createElement('span');
+        itemSubtotals[i].className = "cost-per-item";
+        itemSubtotals[i].innerHTML = "$" + 0;
+        listItemEl.appendChild(itemSubtotals[i]);
+
+        // append all the span elements to the list item element
+        list.appendChild(listItemEl);
+    }   
+}
+initialize();
+
 
 
 // create event listeners for each button 
 function makeEventListeners() {
     for (let j = 0; j<groceryList.length; j++) {
-        quantIdEl[j].addEventListener('input', (e)=> {
+        quantities[j].addEventListener('input', (e)=> {
             // makes it so if user deletes their input it goes to 0 instead of NaN
-            if (quantIdEl[j].value) {
-                quantIdEl[j].value = parseInt(e.target.value);
-                liSubtotalEl[j].innerHTML = "$" + (groceryList[j].pricePerUnit * quantIdEl[j].value).toFixed(2);
+            if (quantities[j].value) {
+                quantities[j].value = parseInt(e.target.value);
+                itemSubtotals[j].innerHTML = "$" + (groceryList[j].pricePerUnit * quantities[j].value).toFixed(2);
             } else {
-                quantIdEl[j].value = 0;
-                liSubtotalEl[j].innerHTML = "$" + (groceryList[j].pricePerUnit * quantIdEl[j].value).toFixed(2);
+                quantities[j].value = 0;
+                itemSubtotals[j].innerHTML = "$" + (groceryList[j].pricePerUnit * quantities[j].value).toFixed(2);
             }
             updateTotals();
         });
 
-        minusBtnEl[j].addEventListener('click', ()=> {
+        minusButtons[j].addEventListener('click', ()=> {
             // if the minus button is pushed before any quantity input the value is default to 0. 
-            if (!quantIdEl[j].value) {
-                quantIdEl[j].value = 0;
+            if (!quantities[j].value) {
+                quantities[j].value = 0;
             }
 
-            let quant = parseInt(quantIdEl[j].value); //need to define this first, cant do quantIdEl[j].value-- off the bat! 
+            let quant = parseInt(quantities[j].value); //need to define this first, cant do quantities[j].value-- off the bat! 
             if (quant>= 1) {
                 quant--;
-                liSubtotalEl[j].innerHTML = "$" + (groceryList[j].pricePerUnit * quant).toFixed(2);
-                quantIdEl[j].value = quant;
+                itemSubtotals[j].innerHTML = "$" + (groceryList[j].pricePerUnit * quant).toFixed(2);
+                quantities[j].value = quant;
                 updateTotals();
             } else {
                 quant = 0;
+                itemSubtotals[j].innerHTML = "$" + 0;
+
             }
         });
 
-        plusBtnEl[j].addEventListener('click', ()=> {
-            if (!quantIdEl[j].value) {
-                quantIdEl[j].value = 0;
+        plusButtons[j].addEventListener('click', ()=> {
+            if (!quantities[j].value) {
+                quantities[j].value = 0;
             }
-            let quant = parseInt(quantIdEl[j].value);
+            let quant = parseInt(quantities[j].value);
             quant++
-            liSubtotalEl[j].innerHTML = "$" + (groceryList[j].pricePerUnit * quant).toFixed(2);
-            quantIdEl[j].value = quant;
+            itemSubtotals[j].innerHTML = "$" + (groceryList[j].pricePerUnit * quant).toFixed(2);
+            quantities[j].value = quant;
             updateTotals();
         });
     }
@@ -113,9 +137,9 @@ function updateTotals() {
         let total = 0;
 
         for (let k=0; k<groceryList.length; k++) {
-            // the slice method removes the dollar signs from liSubtotalEl, the .innerHTML method grabs the string within the element. slice says grab the string starting from the 1st index, so you only grab the number.
-            total += parseFloat(liSubtotalEl[k].innerHTML.slice(1));
-            // console.log(liSubtotalEl[0].innerHTML.slice(1));
+            // the slice method removes the dollar signs from itemSubtotals, the .innerHTML method grabs the string within the element. slice says grab the string starting from the 1st index, so you only grab the number.
+            total += parseFloat(itemSubtotals[k].innerHTML.slice(1));
+            // console.log(itemSubtotals[0].innerHTML.slice(1));
         }
         // console.log(total);
         return total;
